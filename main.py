@@ -46,7 +46,6 @@ def upload_to_server(url, filename):
         response = requests.post(url, files=files)
         response.raise_for_status()
         uploaded_image = response.json()
-    os.remove(filename)
     return uploaded_image
 
 
@@ -96,6 +95,7 @@ def main():
     uploaded_image = upload_to_server(upload_url, filename)
     media_id, owner_id = save_to_server(uploaded_image, token)
     publish_comic(group_id, media_id, owner_id, token, title)
+    os.remove(filename)
 
 
 if __name__ == '__main__':
