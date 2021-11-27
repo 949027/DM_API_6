@@ -22,7 +22,7 @@ def download_image(url):
         file.write(response.content)
 
 
-def get_random_number():
+def get_random_comic_number():
     url = 'https://xkcd.com/info.0.json'
     response = requests.get(url)
     response.raise_for_status()
@@ -88,7 +88,7 @@ def main():
     token = os.getenv('VK_TOKEN')
     group_id = os.getenv('GROUP_ID')
 
-    comic_number = get_random_number()
+    comic_number = get_random_comic_number()
     image_url, title = get_comic(comic_number)
     download_image(image_url)
     upload_url = get_upload_url(token)
