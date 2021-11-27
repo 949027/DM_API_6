@@ -15,10 +15,10 @@ def get_comic(comic_number):
     return image_url, title
 
 
-def download_image(url):
+def download_image(url, filename):
     response = requests.get(url)
     response.raise_for_status()
-    with open('comic.png', 'wb') as file:
+    with open(filename, 'wb') as file:
         file.write(response.content)
 
 
@@ -40,13 +40,13 @@ def get_upload_url(token):
     return upload_url
 
 
-def upload_to_server(url):
-    with open('comic.png', 'rb') as file:
+def upload_to_server(url, filename):
+    with open(filename, 'rb') as file:
         files = {'photo': file}
         response = requests.post(url, files=files)
         response.raise_for_status()
         uploaded_image = response.json()
-    os.remove('comic.png')
+    os.remove(filename)
     return uploaded_image
 
 
@@ -87,12 +87,13 @@ def main():
     load_dotenv()
     token = os.getenv('VK_TOKEN')
     group_id = os.getenv('GROUP_ID')
+    filename = 'comic.png'
 
     comic_number = get_random_comic_number()
     image_url, title = get_comic(comic_number)
-    download_image(image_url)
+    download_image(image_url, filename)
     upload_url = get_upload_url(token)
-    uploaded_image = upload_to_server(upload_url)
+    uploaded_image = upload_to_server(upload_url, filename)
     media_id, owner_id = save_to_server(uploaded_image, token)
     publish_comic(group_id, media_id, owner_id, token, title)
 
