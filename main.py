@@ -92,14 +92,16 @@ def main():
     group_id = os.getenv('GROUP_ID')
     filename = 'comic.png'
 
-    comic_number = get_random_comic_number()
-    image_url, title = get_comic(comic_number)
-    download_image(image_url, filename)
-    upload_url = get_upload_url(token)
-    image, server, hash = upload_to_server(upload_url, filename)
-    media_id, owner_id = save_to_server(image, server, hash, token)
-    publish_comic(group_id, media_id, owner_id, token, title)
-    os.remove(filename)
+    try:
+        comic_number = get_random_comic_number()
+        image_url, title = get_comic(comic_number)
+        download_image(image_url, filename)
+        upload_url = get_upload_url(token)
+        image, server, hash = upload_to_server(upload_url, filename)
+        media_id, owner_id = save_to_server(image, server, hash, token)
+        publish_comic(group_id, media_id, owner_id, token, title)
+    finally:
+        os.remove(filename)
 
 
 if __name__ == '__main__':
