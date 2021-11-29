@@ -5,6 +5,15 @@ from dotenv import load_dotenv
 import requests
 
 
+def check_api_error(response):
+    if response.get('error'):
+        error_code = response['error']['error_code']
+        error_msg = response['error']['error_msg']
+        raise requests.HTTPError(
+            f'VK API ERROR! Code: {error_code}. Message: {error_msg}'
+        )
+
+
 def get_comic(comic_number):
     url = f'https://xkcd.com/{comic_number}/info.0.json'
     response = requests.get(url)
@@ -36,6 +45,7 @@ def get_upload_url(token):
     payload = {'access_token': token, 'v': '5.131'}
     response = requests.get(url, params=payload)
     response.raise_for_status()
+    check_api_error(response.json())
     upload_url = response.json()['response']['upload_url']
     return upload_url
 
@@ -46,6 +56,7 @@ def upload_to_server(url, filename):
         response = requests.post(url, files=files)
     response.raise_for_status()
     uploaded_image = response.json()
+    check_api_error(uploaded_image)
     image, server, hash = \
         uploaded_image['photo'], \
         uploaded_image['server'], \
@@ -64,6 +75,7 @@ def save_to_server(image, server, hash, token):
     }
     response = requests.post(url, params=payload)
     response.raise_for_status()
+    check_api_error(response.json())
     saved_image = response.json()['response'][0]
     media_id = saved_image['id']
     owner_id = saved_image['owner_id']
@@ -84,6 +96,7 @@ def publish_comic(group_id, media_id, owner_id, token, title):
     }
     response = requests.get(url, params=payload)
     response.raise_for_status()
+    check_api_error(response.json())
 
 
 def main():
@@ -100,6 +113,8 @@ def main():
         image, server, hash = upload_to_server(upload_url, filename)
         media_id, owner_id = save_to_server(image, server, hash, token)
         publish_comic(group_id, media_id, owner_id, token, title)
+    except requests.HTTPError as error:
+        print(error)
     finally:
         os.remove(filename)
 
