@@ -58,11 +58,11 @@ def upload_to_server(url, filename):
     response.raise_for_status()
     uploaded_image = response.json()
     check_api_error(uploaded_image)
-    image, server, hash = \
+    image, server, img_hash = \
         uploaded_image['photo'], \
         uploaded_image['server'], \
         uploaded_image['hash']
-    return image, server, hash
+    return image, server, img_hash
 
 
 def save_to_server(image, server, hash, token):
@@ -112,8 +112,8 @@ def main():
         image_url, title = get_comic(comic_number)
         download_image(image_url, filename)
         upload_url = get_upload_url(token)
-        image, server, hash = upload_to_server(upload_url, filename)
-        media_id, owner_id = save_to_server(image, server, hash, token)
+        image, server, img_hash = upload_to_server(upload_url, filename)
+        media_id, owner_id = save_to_server(image, server, img_hash, token)
         publish_comic(group_id, media_id, owner_id, token, title)
     except requests.HTTPError as error:
         print(error)
