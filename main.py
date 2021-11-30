@@ -45,8 +45,9 @@ def get_upload_url(token):
     payload = {'access_token': token, 'v': '5.131'}
     response = requests.get(url, params=payload)
     response.raise_for_status()
-    check_api_error(response.json())
-    upload_url = response.json()['response']['upload_url']
+    decoded_response = response.json()
+    check_api_error(decoded_response)
+    upload_url = decoded_response['response']['upload_url']
     return upload_url
 
 
@@ -75,8 +76,9 @@ def save_to_server(image, server, hash, token):
     }
     response = requests.post(url, params=payload)
     response.raise_for_status()
-    check_api_error(response.json())
-    saved_image = response.json()['response'][0]
+    decoded_response = response.json()
+    check_api_error(decoded_response)
+    saved_image = decoded_response['response'][0]
     media_id = saved_image['id']
     owner_id = saved_image['owner_id']
     return media_id, owner_id
