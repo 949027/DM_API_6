@@ -36,7 +36,7 @@ def get_random_comic_number():
     response = requests.get(url)
     response.raise_for_status()
     comic_amount = response.json()['num']
-    random_number = random.randint(1, comic_amount + 1)
+    random_number = random.randint(1, comic_amount)
     return random_number
 
 
@@ -107,10 +107,11 @@ def main():
     group_id = os.getenv('GROUP_ID')
     filename = 'comic.png'
 
+    comic_number = get_random_comic_number()
+    image_url, title = get_comic(comic_number)
+    download_image(image_url, filename)
+
     try:
-        comic_number = get_random_comic_number()
-        image_url, title = get_comic(comic_number)
-        download_image(image_url, filename)
         upload_url = get_upload_url(token)
         image, server, img_hash = upload_to_server(upload_url, filename)
         media_id, owner_id = save_to_server(image, server, img_hash, token)
